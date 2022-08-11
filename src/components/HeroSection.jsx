@@ -38,6 +38,7 @@ const HeroText = styled.div`
         font-size: 1rem;
         line-height: 125%;
         letter-spacing: 0.005em;
+        color: var(--grey);
     }
 
     @media ${device.laptopL}{
