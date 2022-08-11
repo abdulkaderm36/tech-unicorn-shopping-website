@@ -1,9 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import phone from '../assets/phone.svg'
-import truck from '../assets/truck.svg'
-import menu from '../assets/hamburger-menu.svg'
 import search from '../assets/search.svg'
 import heart from '../assets/heart.svg'
 import cart from '../assets/cart.svg'
@@ -12,52 +9,7 @@ import bell from '../assets/bell.svg'
 
 import device from '../screen-sizes/devices'
 
-const TopBar = styled.div`
-    height: 93px;
-    background-color: #FFFFFF;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 1rem;
-
-    @media ${device.laptop}{
-        padding: 0 5.8rem;
-    }
-`
-
-const Logo = styled.h1`
-    font-weight: 700;
-    font-size: 39px;
-    line-height: 120%;
-    letter-spacing: 0.005em;
-    color: var(--primary);
-    flex: 1;
-    text-align: center;
-
-    @media ${device.tablet}{
-        text-align: left;
-    }
-`
-
-const Menu = styled.ul`
-    list-style: none;
-    display: none;
-    gap:2.2rem;
-    font-weight: 500;
-    color: var(--secondary);
-
-    & li{
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    @media ${device.tablet}{
-        display: flex;
-    }
-`
-
-const BottomBar = styled.div`
+const Container = styled.div`
     display: flex;
     flex-direction: column;
     padding: 1.8rem 1rem;
@@ -156,24 +108,7 @@ const NavMenuRight = styled.ul`
 
 const NavBar = () => {
   return (
-    <>
-    <TopBar>
-        <Logo>
-            Dealerz.
-        </Logo>
-        <Menu>
-            <li>
-                <img src={phone} alt="phone-icon" />
-                Call Center
-            </li>
-            <li>
-                <img src={truck} alt="truck-icon" />
-                Shipping & Returns
-            </li>
-        </Menu>
-    </TopBar>
-
-    <BottomBar>
+    <Container>
         <NavMenuLeft>
             <li>
                 <a href="#">Shop</a>
@@ -214,8 +149,7 @@ const NavBar = () => {
                 </a>
             </li>
         </NavMenuRight>
-    </BottomBar>
-    </>
+    </Container>
   )
 }
 
