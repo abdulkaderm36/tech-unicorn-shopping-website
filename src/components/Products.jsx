@@ -74,6 +74,9 @@ const Modal = styled.div`
     padding: 2rem;
     background-color: var(--white);
 
+    box-shadow: 1px 1px 3px;
+    border-radius: 5px;
+
     @media ${device.tablet}{
         display: none;
     }
@@ -146,7 +149,13 @@ const CategoryList = styled.ul`
 `
 
 const ProductsList = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
 
+    margin-top: 4rem;
 `
 
 const Products = () => {
@@ -165,7 +174,7 @@ const Products = () => {
         setProducts(data)
     }
 
-    // This will fetch all the products from the api
+    // This will fetch all the categories from the api
     const fetchCategories = async () => {
         const {data} = await axios.get('https://fakestoreapi.com/products/categories')
         
@@ -207,7 +216,8 @@ const Products = () => {
         </Filter>
 
         <ProductsList>
-                <ProductCard product={products[0]}/>
+                {/* Display the product details by passing it to the ProductCard Component */}
+                {products?.length > 0 && products.map(product => <ProductCard key={product.id} product={product} />)}
         </ProductsList>
 
 
