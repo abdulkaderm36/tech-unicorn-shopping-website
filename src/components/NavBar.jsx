@@ -82,8 +82,8 @@ const NavMenuRight = styled.ul`
 
     & .cart-icon::after{
         position: absolute;
-        top: -15px;
-        right: -18px;
+        top: -12px;
+        right: -14px;
         content: '3';
         display:flex;
         justify-content: center;
@@ -133,7 +133,7 @@ const NavBar = () => {
                     <img src={heart} alt="heart-icon" />
                 </a>
             </li>
-            <li class="cart-icon">
+            <li className="cart-icon">
                 <a href="#">
                     <img src={cart} alt="cart-icon" />
                 </a>
