@@ -233,6 +233,7 @@ const ShowMoreButton = styled.button`
 const Products = () => {
     // number of products to show
     const LIMIT = 8
+
     const [products, setProducts] = useState([])
     const [showProducts, setShowProducts] = useState([])
     const [filterProducts, setFilterProducts] = useState([])
@@ -276,12 +277,15 @@ const Products = () => {
     
   })
   
+  // toggles the modal for the filter
   const handleModal = () => {
     setIsModalOpen(!isModalOpen)
   }
 
+  // when the products are filtered we update the states
   const updateProductsLists = (filtered) => {
     if(filtered.length > 0){
+        // sort the products according to price
         let sortedPrice = filtered.sort((a,b) => a.price - b.price)
         setPriceRange([Math.floor(sortedPrice[0].price), Math.floor(sortedPrice[sortedPrice.length-1].price)])
     }
@@ -293,22 +297,23 @@ const Products = () => {
     setShowProducts(filtered.slice(0,LIMIT))
   }
 
+  // handles filter on the basis of search text, category and price
   const handleSearch = (type, e) => {
     if(type === 'category'){
+        // filtering products according to category
         const filtered = products.filter(product => product.category === e)
 
         updateProductsLists(filtered)
-
     }
     else if(type === 'search') {
+        // filtering products according to text
         const param = e.target.value.toLowerCase()
         const filtered = products.filter(product => product.title.toLowerCase().includes(param))
-
-        console.log(filtered)
 
         updateProductsLists(filtered)
     }
 
+    // filter according to the price range
     if(type === 'price'){
         let price = parseInt(e.target.value)
         setCurrPrice(price)
@@ -320,6 +325,7 @@ const Products = () => {
 
   }
 
+  // functionality of the show more button
   const handleShowMore = () => {
     const len = showProducts.length
     const updatedShowProducts = [...showProducts, ...filterProducts.slice(len, len + LIMIT)]
@@ -328,6 +334,8 @@ const Products = () => {
   
   return (
     <Container>
+
+        {/* Filter for screens smaller than a tablet */}
         <Filter>
             <button className="icon" onClick={handleModal}>
                 {
@@ -343,6 +351,8 @@ const Products = () => {
         </Filter>
 
         <ProductsContainer>
+
+            {/* Filter for screens larger than a mobile */}
             <div className="filters">
                 <SearchBar>
                     <input type='text' placeholder='Search products' onChange={(e) => handleSearch('search', e)}/>
@@ -375,6 +385,8 @@ const Products = () => {
                 <FeaturedProducts>
                     <h5 className='heading'>Featured Product</h5>
                     {
+                        // sorting products according to their rating and selecting the first 7
+                        // products for the featured section
                         products?.length>0 && 
                         products.sort((a,b) => b.rating.rate - a.rating.rate).slice(0,7).map(product => 
                             <FeaturedCard product={product}/>
@@ -382,6 +394,7 @@ const Products = () => {
                     }
                 </FeaturedProducts>
             </div>
+
             <div className='products'>
                 <ProductsList>
                         {/* Display the product details by passing it to the ProductCard Component */}
@@ -392,7 +405,9 @@ const Products = () => {
                         </Message>
                         }
                 </ProductsList>
+
                 {
+                    // displaying the show more button only if there are more products available to display
                     showProducts?.length < filterProducts?.length && 
                     <div className="show-more">
                     <ShowMoreButton onClick={handleShowMore}>
