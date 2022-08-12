@@ -9,6 +9,7 @@ import search from '../assets/search.svg'
 
 import device from '../screen-sizes/devices'
 import FeaturedCard from './FeaturedCard'
+import NewsLetter from './NewsLetter'
 import ProductCard from './ProductCard'
 
 const Container = styled.div`
@@ -434,7 +435,7 @@ const Products = () => {
                 </Categories>
             </Modal>
         }
-
+        <NewsLetter/>
     </Container>
   )
 }
