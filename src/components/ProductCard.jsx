@@ -1,8 +1,11 @@
 import React from 'react'
 import styled from 'styled-components'
 
+import device from '../screen-sizes/devices'
+
 import startFill from '../assets/star-fill.svg'
 import startOutline from '../assets/star-outline.svg'
+
 
 const Container = styled.div`
     position: relative;
@@ -15,9 +18,22 @@ const Container = styled.div`
     padding: 1.4rem;
 
     height: 375px;
-    width: 424px;
+    width: 100%;
 
     border-radius: 6px;
+
+    @media ${device.tablet}{
+        width: 100%;
+    }
+
+    @media ${device.laptop}{
+        width: 256px;
+    }
+
+    @media ${device.laptopL}{
+        width: 424px;
+    }
+
 `
 
 const ImageContainer = styled.div`
@@ -28,7 +44,8 @@ const ImageContainer = styled.div`
 
     img{
         height: 200px;
-        object-fit: cover;
+        width: 100%;
+        object-fit: contain;
     }
 `
 
@@ -63,6 +80,10 @@ const InfoContainer = styled.div`
 
     .title{
         font-size: 0.8rem;
+        overflow: hidden;
+        display: -webkit-box;        text-overflow: ellipsis;
+        -webkit-line-clamp: 2; 
+        -webkit-box-orient: vertical;
     }
 
     .rating img{
