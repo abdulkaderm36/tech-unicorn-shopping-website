@@ -8,6 +8,7 @@ import filter from '../assets/filter.svg'
 import search from '../assets/search.svg'
 
 import device from '../screen-sizes/devices'
+import FeaturedCard from './FeaturedCard'
 import ProductCard from './ProductCard'
 
 const Container = styled.div`
@@ -136,6 +137,8 @@ const Categories = styled.div`
     h2{
         font-size: 1.5rem;
     }
+
+    margin-bottom: 4.5rem;
 `
 
 const CategoryList = styled.ul`
@@ -150,6 +153,16 @@ const CategoryList = styled.ul`
         text-transform: capitalize;
 
         cursor: pointer;
+    }
+`
+
+const FeaturedProducts = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    .heading{
+        font-size: 1.5rem;
     }
 `
 
@@ -237,6 +250,7 @@ const Products = () => {
         // To get the highest and lowest price of the products
         let sortedPrice = data.sort((a,b) => a.price - b.price)
         setPriceRange([Math.floor(sortedPrice[0].price), Math.floor(sortedPrice[sortedPrice.length-1].price)])
+
         setProducts(data)
         setFilterProducts(data)
         setRangeProducts(data)
@@ -357,6 +371,15 @@ const Products = () => {
                         }
                     </CategoryList>
                 </Categories>
+                <FeaturedProducts>
+                    <h5 className='heading'>Featured Product</h5>
+                    {
+                        products?.length>0 && 
+                        products.sort((a,b) => b.rating.rate - a.rating.rate).slice(0,7).map(product => 
+                            <FeaturedCard product={product}/>
+                            )
+                    }
+                </FeaturedProducts>
             </div>
             <div className='products'>
                 <ProductsList>
