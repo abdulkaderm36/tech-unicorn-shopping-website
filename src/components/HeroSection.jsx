@@ -16,6 +16,7 @@ const Container = styled.div`
 
 const HeroImage = styled.img`
     width: 100%;
+    height: 512px;
 `
 
 const HeroText = styled.div`
