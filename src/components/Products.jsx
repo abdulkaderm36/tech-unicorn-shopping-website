@@ -157,8 +157,6 @@ const ProductsContainer = styled.div`
     display: flex;
     gap: 1rem;
 
-    justify-content: center;
-
     .filters{
         display: none;
     }
@@ -168,6 +166,7 @@ const ProductsContainer = styled.div`
         justify-content: center;
         align-items: center;
         gap: 1rem;
+        width: 100%;
     }
 
     .show-more{
@@ -187,6 +186,7 @@ const ProductsContainer = styled.div`
 `
 
 const ProductsList = styled.div`
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -199,6 +199,9 @@ const ProductsList = styled.div`
         flex-direction: row;
         margin-top: 0;
     }
+`
+
+const Message = styled.div`
 `
 
 const ShowMoreButton = styled.button`
@@ -218,9 +221,11 @@ const Products = () => {
     const LIMIT = 8
     const [products, setProducts] = useState([])
     const [showProducts, setShowProducts] = useState([])
-    const [pages, setPages] = useState(0)
+    const [filterProducts, setFilterProducts] = useState([])
+    const [rangeProducts, setRangeProducts] = useState([])
     const [categories, setCategories] = useState([])
-    const [searchInput, setSearchInput] = useState('')
+    const [priceRange, setPriceRange] = useState([0,0])
+    const [currPrice, setCurrPrice] = useState(0)
     const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
@@ -228,10 +233,15 @@ const Products = () => {
     // This will fetch all the products from the api
     const fetchProducts = async () => {
         const {data} = await axios.get('https://fakestoreapi.com/products')
-        
+
+        // To get the highest and lowest price of the products
+        let sortedPrice = data.sort((a,b) => a.price - b.price)
+        setPriceRange([Math.floor(sortedPrice[0].price), Math.floor(sortedPrice[sortedPrice.length-1].price)])
         setProducts(data)
-        setShowProducts(data.slice(0, 8))
-        setPages(Math.ceil(data.length/LIMIT))
+        setFilterProducts(data)
+        setRangeProducts(data)
+        setShowProducts(data.slice(0, LIMIT))
+        setCurrPrice(priceRange[0])
     }
 
     // This will fetch all the categories from the api
@@ -255,13 +265,49 @@ const Products = () => {
     setIsModalOpen(!isModalOpen)
   }
 
-  const handleSearch = () => {
+  const updateProductsLists = (filtered) => {
+    if(filtered.length > 0){
+        let sortedPrice = filtered.sort((a,b) => a.price - b.price)
+        setPriceRange([Math.floor(sortedPrice[0].price), Math.floor(sortedPrice[sortedPrice.length-1].price)])
+    }
+    
+    setRangeProducts(filtered)
+
+    filtered = filtered.filter(product => product.price >= currPrice)
+    setFilterProducts(filtered)
+    setShowProducts(filtered.slice(0,LIMIT))
+  }
+
+  const handleSearch = (type, e) => {
+    if(type === 'category'){
+        const filtered = products.filter(product => product.category === e)
+
+        updateProductsLists(filtered)
+
+    }
+    else if(type === 'search') {
+        const param = e.target.value.toLowerCase()
+        const filtered = products.filter(product => product.title.toLowerCase().includes(param))
+
+        console.log(filtered)
+
+        updateProductsLists(filtered)
+    }
+
+    if(type === 'price'){
+        let price = parseInt(e.target.value)
+        setCurrPrice(price)
+        const filtered = rangeProducts.filter(product => product.price >= price)
+
+        setFilterProducts(filtered)
+        setShowProducts(filtered.slice(0,LIMIT))
+    }
 
   }
 
   const handleShowMore = () => {
-    let currentItems = Math.floor(showProducts.length)
-    const updatedShowProducts = [...showProducts, ...products.slice(currentItems,currentItems+LIMIT )]
+    const len = showProducts.length
+    const updatedShowProducts = [...showProducts, ...filterProducts.slice(len, len + LIMIT)]
     setShowProducts(updatedShowProducts)
   }
   
@@ -276,7 +322,7 @@ const Products = () => {
                 }
             </button>
             <SearchBar>
-                <input type='text' placeholder='Search products'/>
+                <input type='text' placeholder='Search products' onChange={(e) => handleSearch('search', e)}/>
                 <img src={search} alt="search-icon" />
             </SearchBar>
         </Filter>
@@ -284,7 +330,7 @@ const Products = () => {
         <ProductsContainer>
             <div className="filters">
                 <SearchBar>
-                    <input type='text' placeholder='Search products'/>
+                    <input type='text' placeholder='Search products' onChange={(e) => handleSearch('search', e)}/>
                     <img src={search} alt="search-icon" />
                 </SearchBar>
                 <InputGroup>
@@ -292,10 +338,10 @@ const Products = () => {
                         Price
                         <img src={filter} alt="filter-icon" />
                     </label>
-                    <input className='custom-range' type="range" />
+                    <input className='custom-range' type="range" min={priceRange[0]} max={priceRange[1]} onChange={(e) => handleSearch('price', e)}/>
                     <p>
                         <span>Range</span>
-                        <span>$5-$20</span>
+                        <span>${priceRange[0]}-${priceRange[1]}</span>
                     </p>
                 </InputGroup>
                 <Categories>
@@ -303,7 +349,7 @@ const Products = () => {
                     <CategoryList>
                         {
                         categories?.map(
-                            (category, index) =>    <li key={index} onClick={()=> handleSearch(category)}>
+                            (category, index) =>    <li key={index} onClick={()=> handleSearch('category', category)}>
                             {category}
                             <img src={caretRight} alt="caret-right-icon" />
                             </li>
@@ -315,9 +361,15 @@ const Products = () => {
             <div className='products'>
                 <ProductsList>
                         {/* Display the product details by passing it to the ProductCard Component */}
-                        {showProducts?.length > 0 && showProducts.map(product => <ProductCard key={product.id} product={product} />)}
+                        {
+                        showProducts?.length > 0 ? showProducts.map(product => <ProductCard key={product.id} product={product} />)
+                        : <Message>
+                            <p>Nothing Found</p>
+                        </Message>
+                        }
                 </ProductsList>
-                {showProducts?.length < products?.length && 
+                {
+                    showProducts?.length < filterProducts?.length && 
                     <div className="show-more">
                     <ShowMoreButton onClick={handleShowMore}>
                         See More
@@ -337,10 +389,10 @@ const Products = () => {
                         Price
                         <img src={filter} alt="filter-icon" />
                     </label>
-                    <input className='custom-range' type="range" />
+                    <input className='custom-range' type="range" min={priceRange[0]} max={priceRange[1]} onChange={(e) => handleSearch('price', e)}/>
                     <p>
                         <span>Range</span>
-                        <span>$5-$20</span>
+                        <span>${priceRange[0]}-${priceRange[1]}</span>
                     </p>
                 </InputGroup>
 
@@ -349,7 +401,7 @@ const Products = () => {
                     <CategoryList>
                         {
                         categories?.map(
-                            (category, index) =>    <li key={index} onClick={()=> handleSearch(category)}>
+                            (category, index) =>    <li key={index} onClick={()=> handleSearch('category', category)}>
                             {category}
                             <img src={caretRight} alt="caret-right-icon" />
                             </li>
