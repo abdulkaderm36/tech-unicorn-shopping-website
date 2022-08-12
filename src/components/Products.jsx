@@ -36,15 +36,12 @@ const Filter = styled.div`
     }
 
     @media ${device.tablet}{
-        .icon {
-            display: none;
-        }
+        display: none;
     }
 
 `
 
 const SearchBar = styled.div`
-    order: 2;
     flex: 1;
     display: flex;
     padding: 1.2rem 2rem;
@@ -63,6 +60,14 @@ const SearchBar = styled.div`
     & input:focus{
         outline: none;
     }
+
+    @media ${device.tablet}{
+        flex: 0;
+        min-width: 15rem;
+        width: 18rem;
+        margin-bottom: 4rem;
+    }
+
 `
 
 const Modal = styled.div`  
@@ -74,7 +79,7 @@ const Modal = styled.div`
     padding: 2rem;
     background-color: var(--white);
 
-    box-shadow: 1px 1px 3px;
+    box-shadow: 1px 1px 3px #00000055;
     border-radius: 5px;
 
     @media ${device.tablet}{
@@ -148,19 +153,72 @@ const CategoryList = styled.ul`
     }
 `
 
+const ProductsContainer = styled.div`
+    display: flex;
+    gap: 1rem;
+
+    justify-content: center;
+
+    .filters{
+        display: none;
+    }
+    .products{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .show-more{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+    @media ${device.tablet}{
+        .filters{
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+`
+
 const ProductsList = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 1rem;
-
+    flex-wrap: wrap;
     margin-top: 4rem;
+
+    @media ${device.tablet}{
+        flex-direction: row;
+        margin-top: 0;
+    }
+`
+
+const ShowMoreButton = styled.button`
+    font-size: 1rem;
+    padding: 1.2rem 1.5rem;
+    background-color: var(--primary);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
 `
 
 const Products = () => {
+    // number of products to show
     const LIMIT = 8
     const [products, setProducts] = useState([])
+    const [showProducts, setShowProducts] = useState([])
+    const [pages, setPages] = useState(0)
     const [categories, setCategories] = useState([])
     const [searchInput, setSearchInput] = useState('')
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -172,6 +230,8 @@ const Products = () => {
         const {data} = await axios.get('https://fakestoreapi.com/products')
         
         setProducts(data)
+        setShowProducts(data.slice(0, 8))
+        setPages(Math.ceil(data.length/LIMIT))
     }
 
     // This will fetch all the categories from the api
@@ -198,6 +258,12 @@ const Products = () => {
   const handleSearch = () => {
 
   }
+
+  const handleShowMore = () => {
+    let currentItems = Math.floor(showProducts.length)
+    const updatedShowProducts = [...showProducts, ...products.slice(currentItems,currentItems+LIMIT )]
+    setShowProducts(updatedShowProducts)
+  }
   
   return (
     <Container>
@@ -215,11 +281,53 @@ const Products = () => {
             </SearchBar>
         </Filter>
 
-        <ProductsList>
-                {/* Display the product details by passing it to the ProductCard Component */}
-                {products?.length > 0 && products.map(product => <ProductCard key={product.id} product={product} />)}
-        </ProductsList>
-
+        <ProductsContainer>
+            <div className="filters">
+                <SearchBar>
+                    <input type='text' placeholder='Search products'/>
+                    <img src={search} alt="search-icon" />
+                </SearchBar>
+                <InputGroup>
+                    <label htmlFor="price">
+                        Price
+                        <img src={filter} alt="filter-icon" />
+                    </label>
+                    <input className='custom-range' type="range" />
+                    <p>
+                        <span>Range</span>
+                        <span>$5-$20</span>
+                    </p>
+                </InputGroup>
+                <Categories>
+                    <h2>Product Categories</h2>
+                    <CategoryList>
+                        {
+                        categories?.map(
+                            (category, index) =>    <li key={index} onClick={()=> handleSearch(category)}>
+                            {category}
+                            <img src={caretRight} alt="caret-right-icon" />
+                            </li>
+                        )
+                        }
+                    </CategoryList>
+                </Categories>
+            </div>
+            <div className='products'>
+                <ProductsList>
+                        {/* Display the product details by passing it to the ProductCard Component */}
+                        {showProducts?.length > 0 && showProducts.map(product => <ProductCard key={product.id} product={product} />)}
+                </ProductsList>
+                {showProducts?.length < products?.length && 
+                    <div className="show-more">
+                    <ShowMoreButton onClick={handleShowMore}>
+                        See More
+                    </ShowMoreButton>
+                    </div>
+                }
+                
+            </div>
+        </ProductsContainer>
+        
 
         {/* Modal for the filters. Only available on screens smaller than a tablet. */}
         {isModalOpen && 
